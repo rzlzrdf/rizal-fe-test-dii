@@ -137,7 +137,7 @@ const DataTable = () => {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="min-h-[60svh]">
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={7} className="">
