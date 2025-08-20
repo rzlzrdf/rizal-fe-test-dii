@@ -1,6 +1,6 @@
 "use client";
 
-import { PatientStore, usePatientStore } from "@/store/patientStore";
+import { PatientStore, createPatientStore } from "@/store/patientStore";
 import { createContext, useContext, useRef } from "react";
 import { StoreApi, useStore } from "zustand";
 
@@ -15,9 +15,10 @@ export const PatientProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+    
   const storeRef = useRef<PatientStoreApi | null>(null);
   if (storeRef.current === null) {
-    storeRef.current = usePatientStore;
+    storeRef.current = createPatientStore();
   }
   return (
     <PatientStoreContext.Provider value={storeRef.current}>
@@ -26,13 +27,13 @@ export const PatientProvider = ({
   );
 };
 
-export const useCounterStore = <T,>(
+export const usePatientStoreContext = <T,>(
     selector: (store: PatientStore) => T,
   ): T => {
     const patientStoreContext = useContext(PatientStoreContext)
   
     if (!patientStoreContext) {
-      throw new Error(`useCounterStore must be used within CounterStoreProvider`)
+      throw new Error(`usePatientStoreContext must be used within PatientProvider`)
     }
   
     return useStore(patientStoreContext, selector)
