@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { usePatientStore } from "@/store/patientStore";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnFiltersState,
   ColumnSort,
@@ -31,15 +31,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Inbox, Loader } from "lucide-react";
 import SearchDebounced from "./search-debounced";
 import {
   Pagination,
-  PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 
 const DataTable = () => {
@@ -48,8 +45,16 @@ const DataTable = () => {
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10, // 👈 default rows per page
+    pageSize: 10,
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+  }, [patients]);
 
   const table = useReactTable({
     data: patients,
@@ -136,7 +141,15 @@ const DataTable = () => {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="">
+                  <div className="w-full min-h-[60svh] flex justify-center items-center">
+                    <Loader className="animate-spin" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -156,8 +169,9 @@ const DataTable = () => {
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-64">
                   <div className="flex flex-col items-center justify-center gap-4 py-12">
-                    <div className="text-center">
-                      <p className="body-base-bold">Tidak ada data</p>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Inbox />
+                      <p className="body-base-bold">Belum ada daftar pasien</p>
                     </div>
                   </div>
                 </TableCell>
@@ -185,7 +199,6 @@ const DataTable = () => {
           {Array.from({ length: table.getPageCount() }, (_, i) => (
             <PaginationItem key={i}>
               <PaginationLink
-                
                 isActive={table.getState().pagination.pageIndex === i}
                 onClick={(e) => {
                   e.preventDefault();
