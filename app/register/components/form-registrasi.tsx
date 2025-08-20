@@ -74,18 +74,23 @@ const FormRegistrasi = () => {
 
   const onSubmit = (data: FormRegistrasi) => {
     setTimeout(() => {
-      addPatient({
-        id: crypto.randomUUID(),
-        name: data.name,
-        nik: data.nik,
-        diagnosis: data.diagnosis,
-        date_in: dayjs(data.date_in).format("YYYY-MM-DD"),
-        doctor: doctors.find((doctor) => doctor.id.toString() === data.doctor)!,
-        room: rooms.find((room) => room.id.toString() === data.room)!,
-      });
-      toast.success("Pasien berhasil didaftarkan");
-      form.reset();
-      router.push("/");
+      try {
+        addPatient({
+          id: crypto.randomUUID(),
+          name: data.name,
+          nik: data.nik,
+          diagnosis: data.diagnosis,
+          date_in: dayjs(data.date_in).format("YYYY-MM-DD"),
+          doctor: doctors.find((doctor) => doctor.id.toString() === data.doctor)!,
+          room: rooms.find((room) => room.id.toString() === data.room)!,
+        });
+        toast.success("Pasien berhasil didaftarkan");
+        form.reset();
+        router.push("/");
+      } catch (error) {
+        toast.error("Pasien Gagal didaftarkan");
+        
+      }
     }, 500);
   };
 
