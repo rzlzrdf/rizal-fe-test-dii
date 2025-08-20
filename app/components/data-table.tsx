@@ -13,14 +13,13 @@ import { usePatientStore } from "@/store/patientStore";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
-  ColumnFiltersState,
   ColumnSort,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { columns } from "./columns";
 import {
@@ -41,7 +40,7 @@ import {
 
 const DataTable = () => {
   const { patients } = usePatientStore();
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -59,25 +58,23 @@ const DataTable = () => {
   const table = useReactTable({
     data: patients,
     columns,
-    onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
     state: {
-      columnFilters,
+      globalFilter,
       sorting,
       pagination,
     },
     getCoreRowModel: getCoreRowModel(),
+    enableGlobalFilter: true,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
 
   const handleSearch = (search: string) => {
-    setColumnFilters([
-      { id: "name", value: search },
-      { id: "nik", value: search },
-    ]);
+    setGlobalFilter(search);
   };
 
   return (
@@ -140,7 +137,7 @@ const DataTable = () => {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="min-h-[60svh]">
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={7} className="">

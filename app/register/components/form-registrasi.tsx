@@ -34,6 +34,7 @@ import { doctors, rooms } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { usePatientStore } from "@/store/patientStore";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -58,6 +59,7 @@ type FormRegistrasi = z.infer<typeof formSchema>;
 
 const FormRegistrasi = () => {
   const { addPatient } = usePatientStore();
+  const router = useRouter();
   const form = useForm<FormRegistrasi>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,17 +74,23 @@ const FormRegistrasi = () => {
 
   const onSubmit = (data: FormRegistrasi) => {
     setTimeout(() => {
-      addPatient({
-        id: crypto.randomUUID(),
-        name: data.name,
-        nik: data.nik,
-        diagnosis: data.diagnosis,
-        date_in: dayjs(data.date_in).format("YYYY-MM-DD"),
-        doctor: doctors.find((doctor) => doctor.id.toString() === data.doctor)!,
-        room: rooms.find((room) => room.id.toString() === data.room)!,
-      });
-      toast.success("Pasien berhasil didaftarkan");
-      form.reset();
+      try {
+        addPatient({
+          id: crypto.randomUUID(),
+          name: data.name,
+          nik: data.nik,
+          diagnosis: data.diagnosis,
+          date_in: dayjs(data.date_in).format("YYYY-MM-DD"),
+          doctor: doctors.find((doctor) => doctor.id.toString() === data.doctor)!,
+          room: rooms.find((room) => room.id.toString() === data.room)!,
+        });
+        toast.success("Pasien berhasil didaftarkan");
+        form.reset();
+        router.push("/");
+      } catch (error) {
+        toast.error("Pasien Gagal didaftarkan");
+        
+      }
     }, 500);
   };
 
@@ -94,7 +102,7 @@ const FormRegistrasi = () => {
           Silahkan isi form dibawah ini untuk mendaftar pasien baru
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-hidden">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
@@ -143,7 +151,7 @@ const FormRegistrasi = () => {
                   </FormItem>
                 )}
               />
-              <div className="grid lg:grid-cols-2 gap-4">
+              <div className="w-full grid lg:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="date_in"
@@ -169,14 +177,14 @@ const FormRegistrasi = () => {
                       <FormLabel>Dokter</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value ?? ""}
                       >
                         <FormControl>
                           <SelectTrigger className="w-full overflow-hidden">
                             <SelectValue placeholder="Pilih Dokter" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="w-full">
                           {doctors.map((doctor) => (
                             <SelectItem
                               key={doctor.id}
@@ -200,14 +208,14 @@ const FormRegistrasi = () => {
                     <FormLabel>Kamar</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? ""}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full overflow-hidden">
                           <SelectValue placeholder="Pilih ruangan" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="w-full">
                         {rooms.map((room) => (
                           <SelectItem key={room.id} value={room.id.toString()}>
                             {room.name}
