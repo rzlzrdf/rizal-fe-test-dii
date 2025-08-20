@@ -1,3 +1,4 @@
+import { DoctorType, RoomType } from "@/lib/data";
 import { create } from "zustand";
 
 export type Patient = {
@@ -6,15 +7,8 @@ export type Patient = {
     nik: string;
     diagnosis: string;
     date_in: string;
-    doctor: {
-        id: string;
-        name: string;
-        specialization: string;
-    }
-    room: {
-        id: string;
-        name: string;
-    }
+    doctor: DoctorType
+    room: RoomType
 }
 
 export type PatientAction = {
